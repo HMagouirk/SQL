@@ -1,0 +1,93 @@
+#This analysis utilized the following information on a library database:
+CREATE TABLE patrons (id INTEGER PRIMARY KEY,
+fullname TEXT,
+age INTEGER,
+email TEXT,
+phone TEXT);
+
+INSERT INTO patrons (fullname, age, email, phone)
+VALUES
+("Sharon Styles", "42", "null", "713-234-5678");
+INSERT INTO patrons (fullname, age, email, phone)
+VALUES
+("Harry Smith", "22", "smith@yahoo.com", "281-897-6543");
+INSERT INTO patrons (fullname, age, email, phone)
+VALUES
+("Phoebe Jones", "12", "jones@gmail.com", "null");
+INSERT INTO patrons (fullname, age, email, phone)
+VALUES
+("Lars McBride", "65", "lars@yahoo.com", "713-456-1234");
+
+
+
+CREATE TABLE publications (id INTEGER PRIMARY KEY, title TEXT, author TEXT, genre TEXT, published INTEGER, owned INTEGER);
+
+INSERT INTO publications (title, author, genre, published, owned)
+VALUES ("The Stone", "B. Arthur", "Mystery", "2002", "12");
+INSERT INTO publications (title, author, genre, published, owned)
+VALUES ("I Love Books", "C. Danes", "Edcuational", "2014", "8");
+INSERT INTO publications (title, author, genre, published, owned)
+VALUES ("Coffee Shop", "H. Jones", "Mystery", "1979", "10");
+INSERT INTO publications (title, author, genre, published, owned)
+VALUES ("The Times", "S. Smith", "Biography", "1999", "6");
+
+
+
+CREATE TABLE activity (id INTEGER PRIMARY KEY, publication_id INTEGER, patron_id INTEGER, checked_out TEXT, due TEXT, returned TEXT);
+
+INSERT INTO activity (publication_id, patron_id, checked_out, due, returned)
+VALUES ("1", "3", "11/2/2023", "11/12/2023", "OVERDUE");
+INSERT INTO activity (publication_id, patron_id, checked_out, due, returned)
+VALUES ("4", "1", "1/20/2024", "1/30/2024", "not yet due");
+INSERT INTO activity (publication_id, patron_id, checked_out, due, returned)
+VALUES ("2", "2", "1/1/2024", "1/10/2024", "1/10/2024");
+INSERT INTO activity (publication_id, patron_id, checked_out, due, returned)
+VALUES ("3", "4", "12/11/2023", "12/21/2023", "12/30/2023");
+
+Analysis:
+
+#Which books are checked out, by whom, and what is their status? I want to see the title of the publication along with the author,
+    as well as the contact information for those patrons.
+
+SELECT patrons.fullname, patrons.email, patrons.phone,
+publications.title, publications.author, activity.returned
+FROM activity
+JOIN patrons
+ON activity.patron_id=patrons.id
+JOIN publications
+ON activity.publication_id=publications.id
+WHERE activity.returned="OVERDUE" OR activity.returned="not yet due";
+
+
+#How many books are in circulation vs. how many are available to check out? 
+    Using aggregations with a CROSS JOIN, I was able to query the data that I needed.
+
+
+SELECT SUM(owned) AS in_circulation FROM publications;
+ SELECT COUNT(id) AS checked_out
+FROM activity
+WHERE returned="OVERDUE" OR returned="not yet due";
+ 
+ CREATE TABLE results (available INTEGER);
+ INSERT INTO results (available) VALUES (34);
+
+SELECT *
+FROM
+(SELECT SUM(publications.owned) AS in_circulation
+FROM publications)
+CROSS JOIN
+(SELECT COUNT(activity.id) AS checked_out
+FROM activity
+WHERE returned="OVERDUE" OR returned="not yet due")
+ CROSS JOIN
+(SELECT available FROM results);
+
+ #What is the average age of patrons who enjoy the Mystery genre?
+
+SELECT ROUND(AVG(patrons.age*1.0),0) AS avg_age,
+       publications.genre
+       FROM activity
+       JOIN publications, patrons
+       ON activity.publication_id=publications.id
+       WHERE publications.genre="Mystery"
+       AND patrons.id=activity.patron_id;
