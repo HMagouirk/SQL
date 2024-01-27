@@ -1,4 +1,4 @@
-#This analysis utilized the following information on a library database:
+#This analysis utilizes SQLite to analyze the following information on a library database:
 CREATE TABLE patrons (id INTEGER PRIMARY KEY,
 fullname TEXT,
 age INTEGER,
