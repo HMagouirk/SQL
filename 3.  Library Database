@@ -1,4 +1,4 @@
-#This analysis utilizes SQLite to analyze the following information on a library database:
+#This analysis utilizes SQLite to analyze the following information on a library database, assuming today's date is 01/25/2024:
 CREATE TABLE patrons (id INTEGER PRIMARY KEY,
 fullname TEXT,
 age INTEGER,
