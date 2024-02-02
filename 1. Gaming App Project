@@ -1,0 +1,78 @@
+# This project utilizes write operations, a window function, and a transaction to modify a gaming app's database.
+
+CREATE TABLE Users (
+    ID INTEGER PRIMARY KEY,
+    UserName TEXT,
+    StatusText TEXT);
+
+CREATE TABLE ChatMessages (
+    MessageID INTEGER PRIMARY KEY,
+    SenderID INTEGER,
+    ReceiverID INTEGER,
+    MessageText TEXT);
+
+CREATE TABLE UserItems (
+    ItemID INTEGER PRIMARY KEY,
+    UserID INTEGER,
+    ItemName TEXT,
+    ItemDescription TEXT,
+    Quantity INTEGER);
+
+INSERT INTO Users (Username, StatusText) 
+VALUES ("Alias123", "Times Stands Still For No Man");
+INSERT INTO Users (Username, StatusText)
+VALUES ("Purple42", "Time is an illusion!");
+INSERT INTO Users (Username, StatusText)
+VALUES ("92Beans", "Lo And Behold");
+
+INSERT INTO ChatMessages (MessageID,SenderID, ReceiverID, MessageText)
+VALUES (2, 123, 456, "The cereal is burning.");
+INSERT INTO ChatMessages (MessageID, SenderID, ReceiverID, MessageText)
+VALUES (3, 567, 789, "I like to make pancakes.");
+INSERT INTO ChatMessages (MessageID, SenderID, ReceiverID, MessageText)
+VALUES (4, 111, 222, "Why is the sky blue?");
+
+
+INSERT INTO UserItems (ItemID, UserID, ItemName, ItemDescription, Quantity)
+VALUES (3, 123, "Sword", "Weapon", 1);
+INSERT INTO UserItems (ItemID, UserID, ItemName, ItemDescription, Quantity)
+VALUES (11, 445, "Hat", "Clothing", 2);
+INSERT INTO UserItems (ItemID, UserID, ItemName, ItemDescription, Quantity)
+VALUES (4, 929, "Infinity Stone", "Food", 9);
+
+
+# In this example, I corrected the spelling of a username.
+
+UPDATE Users SET UserName = "123Alias" WHERE UserName = "Alias123";
+
+
+# I deleted a row from this table where the data proved to be invalid.
+
+DELETE FROM UserItems WHERE ItemID = 4;
+
+
+# An update was made to the app where a new function was added, allowing a user to select an emotion per chat message.
+  I altered the table and updated the information to reflect the current data. I used a transaction to ensure that 
+  no other transactions could operate on that same data while my sequence of commands was running.
+
+ALTER TABLE ChatMessages ADD emotion TEXT default "Unknown";
+
+BEGIN TRANSACTION;
+UPDATE ChatMessages SET emotion = "happy" WHERE MessageID = 2;
+UPDATE ChatMessages SET emotion = "sad" WHERE MessageID = 3;
+UPDATE ChatMessages SET emotion = "confused" WHERE MessageID = 4;
+COMMIT;
+
+
+# I wanted to see the total quantity of items per user compared to the number of items per transaction.
+  
+SELECT
+    ItemID,
+    UserID,
+    ItemName,
+    ItemDescription,
+    Quantity,
+    (SELECT SUM(Quantity) FROM UserItems u2 WHERE u2.UserID = UserItems.UserID) AS TotalQuantity
+FROM
+    UserItems;
+
