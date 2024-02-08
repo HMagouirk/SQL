@@ -1,0 +1,126 @@
+#This project utilizes multiple tables and advanced queries to analyze data from the Chinook database.
+
+
+#1. I first needed to know which customers are not located in the United States of America.
+
+SELECT * FROM customers WHERE country<>'USA'
+
+
+
+#2. I wnated to see the invoice Id's and totals for our sales in Germany per customer.
+
+
+ SELECT  c.CustomerId,  i.InvoiceId, i.InvoiceDate, c.FirstName, c.LastName, c.Country, c.Email, c.SupportRepId, i.Total
+FROM customers c
+JOIN invoices i
+ON c.CustomerId = i.CustomerId
+AND c.Country='Germany'
+ORDER BY c.CustomerId
+
+
+
+#3. Here is the information for our sales staff along with who they report to.
+
+
+SELECT 
+    e.EmployeeID,
+    e.FirstName,
+    e.LastName,
+    e.Title,
+    e.Email,
+      r.Title AS ReportsTo,
+    r.FirstName AS RFirst,
+    r.LastName AS RLast,
+    r.Email AS REmail
+FROM 
+    Employees e
+JOIN 
+    Employees r ON e.ReportsTo = r.EmployeeID
+  WHERE e.Title like 'Sales%'
+
+
+
+
+#4. I wanted to see the total sales from India grouped by year.
+
+SELECT BillingCountry,
+CASE WHEN InvoiceDate between '2009-01-01 00:00:0000' and '2009-12-31 00:00:0000' THEN '2009'
+WHEN InvoiceDate between '2010-01-01 00:00:0000' and '2010-12-31 00:00:0000' THEN '2010'
+WHEN InvoiceDate between '2011-01-01 00:00:0000' and '2011-12-31 00:00:0000' THEN '2011'
+WHEN InvoiceDate between '2012-01-01 00:00:0000' and '2012-12-31 00:00:0000' THEN '2012'
+WHEN InvoiceDate between '2013-01-01 00:00:0000' and '2013-12-31 00:00:0000' THEN '2013'
+ELSE 'Null'
+END AS 'Invoice_Year',
+SUM(Total) AS 'Total_Revenue'
+FROM invoices
+WHERE BillingCountry='India'
+GROUP BY Invoice_Year
+
+
+
+#5. Next, I wanted to see the total sales per agent from 2009 to 2013.
+
+SELECT 
+    e.EmployeeID,
+    e.FirstName,
+    e.LastName,
+    ROUND(SUM(i.Total),2) AS Total_Sales
+FROM 
+    employees e
+JOIN 
+    customers c ON e.EmployeeID = c.SupportRepId
+JOIN 
+    invoices i ON c.CustomerID = i.CustomerID
+    GROUP BY e.EmployeeID, e.FirstName, e.LastName
+
+
+
+
+#6. I wanted to see the IDs of the items sold per invoice along with their unit cost and amount sold.
+
+SELECT i.InvoiceId, t.TrackId, t.InvoiceLineId, t.UnitPrice, t.Quantity 
+FROM invoices i
+JOIN invoice_items t
+ON i.InvoiceId=t.InvoiceId
+
+
+
+
+#7. I needed to find how many times each song appears in the rock genre along with it's identifying information.
+
+SELECT 
+    pt.TrackId,  g.Name AS 'genre', 
+    (SELECT COUNT(*)
+     FROM playlist_track pt_inner
+     JOIN tracks t_inner ON pt_inner.TrackId = t_inner.TrackId
+     JOIN genres g_inner ON t_inner.GenreId = g_inner.GenreId
+     WHERE pt_inner.TrackId = pt.TrackId AND g_inner.Name = 'Rock') AS 'total_appearances',
+
+    t.Name AS 'track_name', 
+    ab.title AS 'album_title', 
+    t.Composer
+FROM 
+    playlists p
+JOIN 
+    playlist_track pt ON p.PlaylistId = pt.PlaylistId
+JOIN 
+    genres g ON g.GenreId = t.GenreId
+JOIN 
+    tracks t ON t.TrackId = pt.TrackId
+JOIN 
+    albums ab ON ab.AlbumId = t.AlbumId
+WHERE 
+    g.Name = 'Rock'
+    GROUP BY pt.TrackId
+
+
+
+
+
+
+
+
+
+
+
+
