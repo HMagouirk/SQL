@@ -1,0 +1,18 @@
+Data Sources: 
+
+I've extracted data from these data sources: Khan Academy's github, bit.io's cloud database, the BIT_DB database, the chinook database, the Our World in Data website, and Kaggle.
+
+When working with the World COVID data, I noticed a "Location" field that included locations around the world, plus income identifiers like "Lower Middle Income". 
+I fixed this by creating a calculated field in Tableau that selected only the income fields, and I also filtered out the incomes from the Location field.
+
+In Tableau, I've updated incomplete data when I imported the FebSales table and had to rename 'Column A' and 'Column B' to 'OrderID' and 'acctnum'. 
+I also had to format the 'Order Date' attribute into the 'Date & Time' datatype.
+
+Numerous instances of duplicate data were fixed by using "SELECT distinct" when running multiple queries.
+
+I've merged mismatched fields when preparing the World Happiness Data in Tableau. This allowed me to merge columns from multiple different csv files so I could run my Tableau analysis across multiple years.
+Multiple instances of messy data were also fixed when working with the Customer & Order Analytics data by filtering out Order IDs that were blank or incorrect.
+
+I've loaded multiple databases into SQLite (BIT_DB and chinook), and I've also loaded multiple tables into the BIT_DB database (SpotifyData and CityBikeLanes). 
+Additionally, I've loaded data into Tableau from csv files and from the BIT_DB database.
+
